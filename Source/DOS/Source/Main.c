@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <math.h>
+#include <dpmi.h>
 
 #define VIDEO_INT			0x10
 #define WRITE_PIXEL			0x0C
@@ -14,6 +15,7 @@
 #define SCREEN_WIDTH	320
 #define SCREEN_HEIGHT	200
 #define NUM_COLOURS		256
+#define SCAN_QUEUE		256
 
 #define Sign( N ) ( ( N < 0 ) ? -1 :( ( N > 0 ) ? 1: 0 ) )
 
@@ -28,6 +30,63 @@ typedef struct __POINT
 
 BYTE *VGA = ( BYTE * )0xA0000;
 WORD *Clock = ( WORD * )0x046C;
+
+BYTE g_ScanCode;
+BYTE g_ScanCodeQueue[ SCAN_QUEUE ];
+BYTE g_ScanCodeHead;
+BYTE g_ScanCodeTail;
+
+_go32_dpmi_seginfo	OldKeyboard, NewKeyboard;
+
+void GetScanCode( void )
+{
+	BYTE AL = 0, AH = 0;
+	int LastKey;
+
+	asm
+	(
+		"CLI;"
+		/* Read scan code */
+		"IN 	$0x60,	%%AL;"
+		"MOV 	%%AL,	%0;"
+		/* Read keyboard status */
+		"IN 	$0x61,	%%AL;"
+		"MOV	%%AL,	%%BL;"
+		"OR		$0x80,	%%AL;"
+		/* Set bit 7 */
+		"OUT	%%AL,	$0x61;"
+		"MOV	%%BL,	%%AL;"
+		/* Clear bit 7 */
+		"OUT	%%AL,	$0x61;"
+		/* Reset PIC */
+		"MOV	$0x20,	%%AL;"
+		"OUT	%%AL,	$0x20;"
+		: "=r"( g_ScanCode )
+	);
+
+	*( g_ScanCodeQueue + g_ScanCodeTail ) = g_ScanCode;
+	++g_ScanCodeTail;
+}
+
+void StartKeyboard( void )
+{
+	NewKeyboard.pm_offset = ( int )GetScanCode;
+	NewKeyboard.pm_selector = _go32_my_cs( );
+	_go32_dpmi_get_protected_mode_interrupt_vector( 0x09, &OldKeyboard );
+
+	g_ScanCodeHead = 0;
+	g_ScanCodeTail = 0;
+	g_ScanCode = 0;
+
+	_go32_dpmi_allocate_iret_wrapper( &NewKeyboard );
+	_go32_dpmi_set_protected_mode_interrupt_vector( 0x09, &NewKeyboard );
+}
+
+void StopKeyboard( void )
+{
+	_go32_dpmi_free_iret_wrapper( &NewKeyboard );
+	_go32_dpmi_set_protected_mode_interrupt_vector( 0x09, &OldKeyboard );
+}
 
 void SetVideoMode( const BYTE p_Mode )
 {
@@ -103,11 +162,13 @@ void DrawLine( const POINT p_Point1, const POINT p_Point2, BYTE p_Colour )
 int main( int p_Argc, char **p_ppArgv )
 {
 	const int Colour = 1;
+	int Key;
 	int LineColour;
 	int Counter = 0;
 	float T1;
 	WORD i, Start;
 	POINT P0, P1;
+	__dpmi_free_mem_info FreeHeap;
 
 	if( __djgpp_nearptr_enable( ) == 0 )
 	{
@@ -126,11 +187,19 @@ int main( int p_Argc, char **p_ppArgv )
 	LineColour = 15;
 
 	SetVideoMode( VGA_256_COLOUR_MODE );
+	StartKeyboard( );
 
 	Start = *Clock;
 
-	while( T1 < 1.0f )
+	Key = 999;
+
+	do
 	{
+		while( g_ScanCodeHead != g_ScanCodeTail )
+		{
+			Key = *( g_ScanCodeQueue + g_ScanCodeHead );
+			++g_ScanCodeHead;
+		}
 		for( i = 0; i < ( 320*200 ); ++i )
 		{
 			PlotPixelDirect( i, Colour );
@@ -141,10 +210,17 @@ int main( int p_Argc, char **p_ppArgv )
 		T1 = ( *Clock - Start )/18.2f;
 		++Counter;
 	}
+	while( Key != 1 ); /* ESC */
 
 	SetVideoMode( TEXT_MODE );
 
+	__dpmi_get_free_memory_information( &FreeHeap );
+
 	printf( "Rendered %d frames in one second\n", Counter );
+	printf( "Free memory: %i [heap]\n",
+		FreeHeap.largest_available_free_block_in_bytes );
+
+	StopKeyboard( );
 
 	__djgpp_nearptr_disable( );
 
