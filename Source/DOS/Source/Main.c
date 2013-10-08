@@ -40,28 +40,29 @@ _go32_dpmi_seginfo	OldKeyboard, NewKeyboard;
 
 void GetScanCode( void )
 {
-	BYTE AL = 0, AH = 0;
-	int LastKey;
-
+	g_ScanCode = 66;
 	asm
 	(
-		"CLI;"
+		"CLI;\n"
 		/* Read scan code */
-		"IN 	$0x60,	%%AL;"
-		"MOV 	%%AL,	%0;"
+		"IN 	$0x60,	%%AL;\n"
+		"MOV 	%%AL,	%0;\n"
 		/* Read keyboard status */
-		"IN 	$0x61,	%%AL;"
-		"MOV	%%AL,	%%BL;"
-		"OR		$0x80,	%%AL;"
+		"IN 	$0x61,	%%AL;\n"
+		"MOV	%%AL,	%%BL;\n"
 		/* Set bit 7 */
-		"OUT	%%AL,	$0x61;"
-		"MOV	%%BL,	%%AL;"
+		"OR		$0x80,	%%AL;\n"
+		"OUT	%%AL,	$0x61;\n"
 		/* Clear bit 7 */
-		"OUT	%%AL,	$0x61;"
+		"MOV	%%BL,	%%AL;\n"
+		"OUT	%%AL,	$0x61;\n"
 		/* Reset PIC */
-		"MOV	$0x20,	%%AL;"
-		"OUT	%%AL,	$0x20;"
+		"MOV	$0x20,	%%AL;\n"
+		"OUT	%%AL,	$0x20;\n"
+		"STI;\n"
 		: "=r"( g_ScanCode )
+		:
+		: "%eax", "%ebx"
 	);
 
 	*( g_ScanCodeQueue + g_ScanCodeTail ) = g_ScanCode;
@@ -193,6 +194,9 @@ int main( int p_Argc, char **p_ppArgv )
 
 	Key = 999;
 
+	/* The main loop should use some kind of timer to control when to run the
+	 * update and also when to render to the screen
+	 */
 	do
 	{
 		while( g_ScanCodeHead != g_ScanCodeTail )
@@ -200,6 +204,7 @@ int main( int p_Argc, char **p_ppArgv )
 			Key = *( g_ScanCodeQueue + g_ScanCodeHead );
 			++g_ScanCodeHead;
 		}
+
 		for( i = 0; i < ( 320*200 ); ++i )
 		{
 			PlotPixelDirect( i, Colour );
@@ -216,7 +221,7 @@ int main( int p_Argc, char **p_ppArgv )
 
 	__dpmi_get_free_memory_information( &FreeHeap );
 
-	printf( "Rendered %d frames in one second\n", Counter );
+	printf( "Rendered %d frames in %f seconds\n", Counter, T1 );
 	printf( "Free memory: %i [heap]\n",
 		FreeHeap.largest_available_free_block_in_bytes );
 
