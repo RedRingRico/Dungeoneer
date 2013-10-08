@@ -1,6 +1,8 @@
 # Directories #
+OBJ
 Obj
 obj
+BIN
 Bin
 bin
 Lib
@@ -15,6 +17,7 @@ ipch
 Data
 gen
 Gen
+ENVVARS
 
 # Complied #
 *.obj
