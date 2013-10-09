@@ -19,8 +19,9 @@ debug:	$(TARGET)
 ifneq ($(notdir $(OBJSDIR)), $(notdir $(CURDIR)))
 
 CFILES			:= $(foreach dir,$(SOURCEDIR),$(notdir $(wildcard $(dir)/*.C)))
+SFILES			:= $(foreach dir,$(SOURCEDIR),$(notdir $(wildcard $(dir)/*.S)))
 export VPATH	:= $(foreach dir, $(SOURCEDIR),$(CURDIR)/$(dir))
-export OBJS		:= $(CFILES:.C=.o)
+export OBJS		:= $(CFILES:.C=.o) $(SFILES:.S=_S.o)
 
 $(TARGET):
 	echo $(OBJSDIR)
@@ -32,7 +33,10 @@ $(TARGET): $(OBJS)
 	gcc -o $(TARGETDIR)\$(TARGET) $(OBJS)
 
 %.o: %.C
-	gcc -c -MMD -MP -MF $*.d -I$(TOPSRC)/DOS/HEADERS $(basename $<).c -o $@
+	gcc -c -x c -MMD -MP -MF $*.d -I$(TOPSRC)/DOS/HEADERS $(basename $<).c -o $@
+
+%_S.o: %.S
+	gcc -c -MMD -MP -MF $*_S.d -I$(TOPSRC)/DOS/HEADERS $(basename $<).s -o $@
 
 -include $(OBJSDIR)\*.d
 

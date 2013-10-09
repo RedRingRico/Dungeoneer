@@ -5,6 +5,9 @@
 #include <unistd.h>
 #include <math.h>
 #include <dpmi.h>
+#include <stdint.h>
+#include <string.h>
+#include <hwinfo.h>
 
 #define VIDEO_INT			0x10
 #define WRITE_PIXEL			0x0C
@@ -170,6 +173,10 @@ int main( int p_Argc, char **p_ppArgv )
 	WORD i, Start;
 	POINT P0, P1;
 	__dpmi_free_mem_info FreeHeap;
+	char CPUName[ 13 ];
+	uint32_t eax = 0, ebx = 0, ecx = 0, edx = 0;
+	uint32_t CPUID = 0;
+	memset( CPUName, '\0', sizeof( char ) * 13 );
 
 	if( __djgpp_nearptr_enable( ) == 0 )
 	{
@@ -224,6 +231,34 @@ int main( int p_Argc, char **p_ppArgv )
 	printf( "Rendered %d frames in %f seconds\n", Counter, T1 );
 	printf( "Free memory: %i [heap]\n",
 		FreeHeap.largest_available_free_block_in_bytes );
+
+	if( HWI_SupportsCPUID( ) )
+	{
+		printf( "CPU information\n" );
+		printf( "---------------\n" );
+
+		asm volatile
+		(
+			"\t"
+			"pushl	%%ebx\n\t"
+			"cpuid\n\t"
+			"movl	%%ebx,	%1\n\t"
+			"popl	%%ebx\n\t"
+			: "=a"( eax ), "=r"( ebx ), "=c"( ecx ), "=d"( edx )
+			: "a"( CPUID )
+			: "cc", "ebx"
+		);
+		memcpy( &CPUName[ 0 ], &ebx, sizeof( uint32_t ) );
+		memcpy( &CPUName[ 4 ], &edx, sizeof( uint32_t ) );
+		memcpy( &CPUName[ 8 ], &ecx, sizeof( uint32_t ) );
+		printf( "\tName: %s\n", CPUName );
+
+		printf( "\n" );
+	}
+	else
+	{
+		printf( "CPUID Not supported!\n" );
+	}
 
 	StopKeyboard( );
 
