@@ -234,26 +234,9 @@ int main( int p_Argc, char **p_ppArgv )
 
 	if( HWI_SupportsCPUID( ) )
 	{
-		printf( "CPU information\n" );
-		printf( "---------------\n" );
-
-		asm volatile
-		(
-			"\t"
-			"pushl	%%ebx\n\t"
-			"cpuid\n\t"
-			"movl	%%ebx,	%1\n\t"
-			"popl	%%ebx\n\t"
-			: "=a"( eax ), "=r"( ebx ), "=c"( ecx ), "=d"( edx )
-			: "a"( CPUID )
-			: "cc", "ebx"
-		);
-		memcpy( &CPUName[ 0 ], &ebx, sizeof( uint32_t ) );
-		memcpy( &CPUName[ 4 ], &edx, sizeof( uint32_t ) );
-		memcpy( &CPUName[ 8 ], &ecx, sizeof( uint32_t ) );
-		printf( "\tName: %s\n", CPUName );
-
-		printf( "\n" );
+		CPU_INFO	Info;
+		HWI_GetCPUInformation( &Info );
+		HWI_ShowCPUInformation( &Info );
 	}
 	else
 	{
