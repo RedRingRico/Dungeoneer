@@ -30,7 +30,7 @@ $(TARGET):
 
 else
 $(TARGET): $(OBJS)
-	gcc -o $(TARGETDIR)\$(TARGET) $(OBJS)
+	gcc -o $(TARGETDIR)\$(TARGET) $(OBJS) -lpdcurses
 
 %.o: %.C
 	gcc -c -x c -MMD -MP -MF $*.d -I$(TOPSRC)/DOS/HEADERS $(basename $<).c -o $@

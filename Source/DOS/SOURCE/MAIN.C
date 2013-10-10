@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <hwinfo.h>
+#include <datatypes.h>
 
 #define VIDEO_INT			0x10
 #define WRITE_PIXEL			0x0C
@@ -176,7 +177,55 @@ int main( int p_Argc, char **p_ppArgv )
 	char CPUName[ 13 ];
 	uint32_t eax = 0, ebx = 0, ecx = 0, edx = 0;
 	uint32_t CPUID = 0;
-	memset( CPUName, '\0', sizeof( char ) * 13 );
+	BOOL ShowCPUInfo = FALSE;
+	CPU_INFO	Info;
+
+	/* Dungeoneer for DOS requires an x86 CPU with FPU */
+	if( HWI_SupportsCPUID( ) )
+	{
+		HWI_GetCPUInformation( &Info );
+
+		if( !( Info.Features.EDX & CPU_FEATURE_FPU ) )
+		{
+			SetVideoMode( TEXT_MODE );
+			printf( "FPU not detected\n"
+				"If you have a CPU with an FPU: http://wiki.osdev.org/FPU, "
+				"but it is not getting detected, please send an e-mail with "
+				"your system specifications to:\n"
+				"sysreq@opengamedevelopers.org\n\nThank you\n\nRico\n\n" );
+
+			return 1;
+		}
+	}
+	else
+	{
+		SetVideoMode( TEXT_MODE );
+		printf( "Could not call CPUID\n" );
+		printf( "If you have a CPU with the CPUID instruction: "
+			"http://wiki.osdev.org/CPUID, but\n"
+			"it is not getting detected, "
+			"please send an e-mail with your system\n"
+			"specifications to: "
+			"sysreq@opengamedevelopers.org\n\n"
+			"Thank you\n\nRico\n\n" );
+
+		return 1;
+	}
+
+	if( p_Argc > 1 )
+	{
+		for( i = 0; i < p_Argc; ++i )
+		{
+			if( strncmp( p_ppArgv[ i ], "--cpuinfo",
+				strlen( "--cpuinfo" ) ) == 0 )
+			{
+				if( strlen( p_ppArgv[ i ] ) == strlen( "--cpuinfo" ) )
+				{
+					ShowCPUInfo = TRUE;
+				}
+			}
+		}
+	}
 
 	if( __djgpp_nearptr_enable( ) == 0 )
 	{
@@ -232,18 +281,12 @@ int main( int p_Argc, char **p_ppArgv )
 	printf( "Free memory: %i [heap]\n",
 		FreeHeap.largest_available_free_block_in_bytes );
 
-	if( HWI_SupportsCPUID( ) )
+	StopKeyboard( );
+
+	if( ShowCPUInfo )
 	{
-		CPU_INFO	Info;
-		HWI_GetCPUInformation( &Info );
 		HWI_ShowCPUInformation( &Info );
 	}
-	else
-	{
-		printf( "CPUID Not supported!\n" );
-	}
-
-	StopKeyboard( );
 
 	__djgpp_nearptr_disable( );
 
