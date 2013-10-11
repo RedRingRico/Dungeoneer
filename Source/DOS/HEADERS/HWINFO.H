@@ -6,12 +6,15 @@
 #define	CPU_TYPE_AMD	"AuthenticAMD"
 #define CPU_TYPE_INTEL	"GenuineIntel"
 
+/* ECX */
 #define CPU_FEATURE_SSE3	1 << 0
 #define CPU_FEATURE_PCLMUL	1 << 1
 #define CPU_FEATURE_DTES64	1 << 2
 #define CPU_FEATURE_MONITOR	1 << 3
 #define CPU_FEATURE_DS_CPL	1 << 4
+#define CPU_FEATURE_MMX		1 << 23
 
+/* EDX */
 #define CPU_FEATURE_FPU	1 << 0
 
 /* Dungeoneer for DOS is intended to only run on 32-bit systems */

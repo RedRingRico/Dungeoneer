@@ -92,6 +92,7 @@ void HWI_ShowCPUInformation( const CPU_INFO *p_pInfo )
 	PrintFeature( p_pInfo, 'c', CPU_FEATURE_DTES64, "DTES64", 7, 0 );
 	PrintFeature( p_pInfo, 'c', CPU_FEATURE_MONITOR, "MONITOR", 8, 0 );
 	PrintFeature( p_pInfo, 'c', CPU_FEATURE_DS_CPL, "DS_CPL", 9, 0 );
+	PrintFeature( p_pInfo, 'c', CPU_FEATURE_MMX, "MMX", 10, 0 );
 
 	mvprintw( 4, 20, "EDX" );
 	PrintFeature( p_pInfo, 'd', CPU_FEATURE_FPU, "FPU", 5, 20 );

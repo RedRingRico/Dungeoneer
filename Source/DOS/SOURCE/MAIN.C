@@ -190,8 +190,22 @@ int main( int p_Argc, char **p_ppArgv )
 			SetVideoMode( TEXT_MODE );
 			printf( "FPU not detected\n"
 				"If you have a CPU with an FPU: http://wiki.osdev.org/FPU, "
-				"but it is not getting detected, please send an e-mail with "
-				"your system specifications to:\n"
+				"but it is not getting\n"
+				"detected, please send an e-mail with your system "
+				"specifications to:\n"
+				"sysreq@opengamedevelopers.org\n\nThank you\n\nRico\n\n" );
+
+			return 1;
+		}
+
+		if( !( Info.Features.EDX & CPU_FEATURE_MMX ) )
+		{
+			SetVideoMode( TEXT_MODE );
+			printf( "MMX not detected\n"
+				"If you have a CPU with the MMX instruction:"
+				"http://wiki.osdev.org/MMX, but it is\n"
+				"not getting detected, please send an e-mail with your "
+				"system specificaions to:\n"
 				"sysreq@opengamedevelopers.org\n\nThank you\n\nRico\n\n" );
 
 			return 1;
@@ -200,12 +214,12 @@ int main( int p_Argc, char **p_ppArgv )
 	else
 	{
 		SetVideoMode( TEXT_MODE );
-		printf( "Could not call CPUID\n" );
-		printf( "If you have a CPU with the CPUID instruction: "
+		printf( "Could not call CPUID\n"
+			"If you have a CPU with the CPUID instruction: "
 			"http://wiki.osdev.org/CPUID, but\n"
 			"it is not getting detected, "
 			"please send an e-mail with your system\n"
-			"specifications to: "
+			"specifications to:\n"
 			"sysreq@opengamedevelopers.org\n\n"
 			"Thank you\n\nRico\n\n" );
 
