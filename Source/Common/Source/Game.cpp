@@ -2,6 +2,7 @@
 #include <cstring>
 #include <System/Memory.hpp>
 #include <unistd.h>
+#include <GitVersion.hpp>
 
 namespace Dungeoneer
 {
@@ -28,6 +29,38 @@ namespace Dungeoneer
 		XEvent Event;
 		ZED::System::WINDOWDATA	WindowData = m_pWindow->WindowData( );
 		// !NOT CROSS-PLATFORM
+		char *pTmpBuffer = new char[ 1024 ];
+		memset( pTmpBuffer, '\0', sizeof( char )*1024 );
+		strcat( pTmpBuffer, "Dungeoneer for " );
+#if defined ZED_PLATFORM_LINUX
+		strcat( pTmpBuffer, "Linux " );
+#elif defined ZED_PLATFORM_WINDOWS
+		strcat( pTmpBuffer, "Windows " );
+#endif // ZED_PLATFORM_LINUX
+
+#if defined ZED_ARCH_X86
+#if defined ZED_BITSIZE_32
+		strcat( pTmpBuffer, "x86" );
+#elif defined ZED_BITSIZE_64
+		strcat( pTmpBuffer, "x86_64" );
+#endif // ZED_BITSIZE_32
+#endif // ZED_ARCH_X86
+
+#if defined ZED_BUILD_DEBUG
+		strcat( pTmpBuffer, " [DEBUG] | Build " );
+		strcat( pTmpBuffer, GIT_COMMITHASH );
+#elif defined ZED_BUILD_PROFILE
+		strcat( pTmpBuffer, " [PROFILE] | Build " );
+		strcat( pTmpBuffer, GIT_COMMITHASH );
+#elif defined ZED_BUILD_RELEASE
+#else
+		#error Incorrect build profile
+#endif // ZED_BUILD_DEBUG
+
+		m_pWindow->Title( pTmpBuffer );
+
+		delete [ ] pTmpBuffer;
+		pTmpBuffer = ZED_NULL;
 		
 		m_Running = ZED_TRUE;
 

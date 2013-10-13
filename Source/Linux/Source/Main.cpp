@@ -3,7 +3,7 @@
 
 int main( int p_Argc, char **p_ppArgv )
 {
-	std::cout << "ZED Template" << std::endl;
+	std::cout << "Dungeoneer" << std::endl;
 
 	Dungeoneer::Game TheGame;
 
