@@ -4,6 +4,7 @@
 #include <System/DataTypes.hpp>
 #include <System/Window.hpp>
 #include <System/Keyboard.hpp>
+#include <System/Mouse.hpp>
 #include <System/InputManager.hpp>
 #include <Renderer/Renderer.hpp>
 #include <Renderer/CanvasDescription.hpp>
@@ -26,6 +27,7 @@ namespace Dungeoneer
 		ZED::System::Window					*m_pWindow;
 		ZED::System::InputManager			*m_pInputManager;
 		ZED::System::Keyboard				m_Keyboard;
+		ZED::System::Mouse					m_Mouse;
 		ZED::Renderer::Renderer				*m_pRenderer;
 		ZED::Renderer::CanvasDescription	m_Canvas;
 

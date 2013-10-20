@@ -56,18 +56,14 @@ namespace Dungeoneer
 		}
 
 		m_pRenderer->ClearColour( 0.14f, 0.0f, 0.14f );
-		m_pRenderer->SetRenderState( ZED_RENDERSTATE_CULLMODE,
+		m_pRenderer->RenderState( ZED_RENDERSTATE_CULLMODE,
 			ZED_CULLMODE_NONE );
-		m_pRenderer->SetRenderState( ZED_RENDERSTATE_DEPTH, ZED_ENABLE );
-		m_pRenderer->SetClippingPlanes( 1.0f, 100000.0f );
-		m_pRenderer->PerspectiveProjectionMatrix( 45.0f,
-			static_cast< ZED_FLOAT32 >( Width ) /
-			static_cast< ZED_FLOAT32 >( Height ) );
+		m_pRenderer->RenderState( ZED_RENDERSTATE_DEPTH, ZED_ENABLE );
 
 		ZED::System::WINDOWDATA WindowData = m_pWindow->WindowData( );
 
 		m_pInputManager =
-			new ZED::System::LinuxInputManager( WindowData.pX11Display );
+			new ZED::System::LinuxInputManager( WindowData );
 
 		if( !m_pInputManager )
 		{
@@ -76,6 +72,7 @@ namespace Dungeoneer
 		}
 
 		m_pInputManager->AddDevice( &m_Keyboard );
+		m_pInputManager->AddDevice( &m_Mouse );
 
 		return ZED_OK;
 	}
