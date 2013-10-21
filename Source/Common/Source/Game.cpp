@@ -3,6 +3,7 @@
 #include <System/Memory.hpp>
 #include <unistd.h>
 #include <GitVersion.hpp>
+#include <Utility/Grid.hpp>
 
 namespace Dungeoneer
 {
@@ -63,6 +64,20 @@ namespace Dungeoneer
 		pTmpBuffer = ZED_NULL;
 		
 		m_Running = ZED_TRUE;
+		ZED::Utility::Grid TestGrid( m_pRenderer );
+		ZED_COLOUR GridColour;
+		GridColour.Red = 1.0f;
+		GridColour.Green = 1.0f;
+		GridColour.Blue = 1.0f;
+		GridColour.Alpha = 1.0f;
+		if( TestGrid.Initialise( 10, 10, ZED::Utility::PLANE_AXIS_XZ, GridColour,
+			0.0f, 1.0f ) != ZED_OK )
+		{
+			zedTrace( "Failed to create a grid\n" );
+			return ZED_FAIL;
+		}
+
+		ZED::Arithmetic::Matrix4x4 ProjView;
 
 		while( m_Running )
 		{
@@ -82,7 +97,11 @@ namespace Dungeoneer
 			}
 			
 			this->Update( 16667ULL );
-			this->Render( );
+//			this->Render( );
+		m_pRenderer->BeginScene( ZED_TRUE, ZED_TRUE, ZED_TRUE );
+			TestGrid.Render( &ProjView );
+
+		m_pRenderer->EndScene( );
 		}
 
 		return ZED_OK;
