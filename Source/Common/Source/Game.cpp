@@ -4,10 +4,13 @@
 #include <unistd.h>
 #include <GitVersion.hpp>
 #include <Utility/Grid.hpp>
-#include <Renderer/Camera.hpp>
+#include <Renderer/FreeCamera.hpp>
 
 const ZED_FLOAT32 STRAFE_SPEED = 0.2f;
 const ZED_FLOAT32 THRUST_SPEED = 0.2f;
+const ZED_FLOAT32 ELEVATE_SPEED = 0.2f;
+const ZED_FLOAT32 YAW_SPEED = 0.01f;
+const ZED_FLOAT32 PITCH_SPEED = 0.01f;
 
 namespace Dungeoneer
 {
@@ -75,14 +78,14 @@ namespace Dungeoneer
 		GridColour.Blue = 0.0f;
 		GridColour.Alpha = 1.0f;
 
-		if( TestGrid.Initialise( 10, 10, ZED::Utility::PLANE_AXIS_XZ,
-			GridColour, 0.0f, 0.1f ) != ZED_OK )
+		if( TestGrid.Initialise( 100, 100, ZED::Utility::PLANE_AXIS_XZ,
+			GridColour, 0.0f, 1.0f ) != ZED_OK )
 		{
 			zedTrace( "Failed to create a grid\n" );
 			return ZED_FAIL;
 		}
 
-		ZED::Renderer::Camera		MainCam;
+		ZED::Renderer::FreeCamera	MainCam;
 		ZED::Arithmetic::Vector3	CamPosition( 0.0f, 10.0f, 12.0f ),
 									CamLook( 0.0f, 0.0f, 0.0f ),
 									WorldUp( 0.0f, 1.0f, 0.0f );
@@ -92,6 +95,8 @@ namespace Dungeoneer
 		MainCam.ClippingPlanes( 1.0f, 10000.0f );
 		MainCam.PerspectiveProjection( 45.0f, 1280.0f / 720.0f, &Projection );
 		ZED::Arithmetic::Vector3 Velocity( 0.0f, 0.0f, 0.0f );
+		ZED::Arithmetic::Vector3 RotVec, RotVel;
+		MainCam.Position( CamPosition );
 
 		while( m_Running )
 		{
@@ -105,7 +110,8 @@ namespace Dungeoneer
 				XNextEvent( WindowData.pX11Display, &Event );
 			}
 
-			Velocity.Set( 0.0f, 0.0f, 0.0f );
+			Velocity.Zero( );
+			RotVel.Zero( );
 
 			if( m_Keyboard.IsKeyDown( 'a' ) )
 			{
@@ -124,14 +130,43 @@ namespace Dungeoneer
 				Velocity[ 2 ] = THRUST_SPEED;
 			}
 
+			if( m_Keyboard.IsKeyDown( 'j' ) )
+			{
+				RotVel[ 1 ] = YAW_SPEED;
+			}
+			if( m_Keyboard.IsKeyDown( 'l' ) )
+			{
+				RotVel[ 1 ] = -YAW_SPEED;
+			}
+			if( m_Keyboard.IsKeyDown( 'i' ) )
+			{
+				RotVel[ 0 ] = PITCH_SPEED;
+			}
+			if( m_Keyboard.IsKeyDown( 'k' ) )
+			{
+				RotVel[ 0 ] = -PITCH_SPEED;
+			}
+
+			if( m_Keyboard.IsKeyDown( K_PGUP ) )
+			{
+				Velocity[ 1 ] = ELEVATE_SPEED;
+			}
+			if( m_Keyboard.IsKeyDown( K_PGDN ) )
+			{
+				Velocity[ 1 ] = -ELEVATE_SPEED;
+			}
+
 			if( m_Keyboard.IsKeyDown( K_ESCAPE ) )
 			{
 				m_Running = ZED_FALSE;
 			}
 
 			CamPosition += Velocity;
+			RotVec += RotVel;
 
-			MainCam.ViewLookAt( CamPosition, CamLook, WorldUp );
+//			MainCam.ViewLookAt( CamPosition, CamLook, WorldUp );
+			MainCam.Move( Velocity );
+			MainCam.Rotate( RotVel );
 			MainCam.View( &View );
 
 			ProjView = Projection * View;
