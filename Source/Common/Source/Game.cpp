@@ -68,10 +68,11 @@ namespace Dungeoneer
 		ZED_COLOUR GridColour;
 		GridColour.Red = 1.0f;
 		GridColour.Green = 1.0f;
-		GridColour.Blue = 1.0f;
+		GridColour.Blue = 0.0f;
 		GridColour.Alpha = 1.0f;
-		if( TestGrid.Initialise( 10, 10, ZED::Utility::PLANE_AXIS_XZ, GridColour,
-			0.0f, 1.0f ) != ZED_OK )
+
+		if( TestGrid.Initialise( 10, 10, ZED::Utility::PLANE_AXIS_XY,
+			GridColour, 0.0f, 0.1f ) != ZED_OK )
 		{
 			zedTrace( "Failed to create a grid\n" );
 			return ZED_FAIL;
