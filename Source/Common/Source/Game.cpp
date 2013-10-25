@@ -97,6 +97,11 @@ namespace Dungeoneer
 		ZED::Arithmetic::Vector3 Velocity( 0.0f, 0.0f, 0.0f );
 		ZED::Arithmetic::Vector3 RotVec, RotVel;
 		MainCam.Position( CamPosition );
+		ZED_UINT32 HalfWidth = 1280 / 2;
+		ZED_UINT32 HalfHeight = 720 / 2;
+		m_pWindow->WarpPointer( HalfWidth, HalfHeight );
+		ZED_UINT32 MouseX = 0, MouseY = 0;
+		m_pWindow->HideCursor( );
 
 		while( m_Running )
 		{
@@ -161,6 +166,27 @@ namespace Dungeoneer
 				m_Running = ZED_FALSE;
 			}
 
+			m_Mouse.Position( &MouseX, &MouseY );
+
+			if( MouseX < HalfWidth )
+			{
+				RotVel[ 1 ] = YAW_SPEED;
+			}
+			if( MouseX > HalfWidth )
+			{
+				RotVel[ 1 ] = -YAW_SPEED;
+			}
+			if( MouseY < HalfHeight )
+			{
+				RotVel[ 0 ] = PITCH_SPEED;
+			}
+			if( MouseY > HalfHeight )
+			{
+				RotVel[ 0 ] = -PITCH_SPEED;
+			}
+
+			m_pWindow->WarpPointer( HalfWidth, HalfHeight );
+
 			CamPosition += Velocity;
 			RotVec += RotVel;
 
@@ -178,6 +204,8 @@ namespace Dungeoneer
 
 		m_pRenderer->EndScene( );
 		}
+
+		m_pWindow->ShowCursor( );
 
 		return ZED_OK;
 	}
