@@ -71,32 +71,31 @@ namespace Dungeoneer
 		pTmpBuffer = ZED_NULL;
 		
 		m_Running = ZED_TRUE;
-		ZED::Utility::Grid TestGrid( m_pRenderer );
+		m_WorldGrid = ZED::Utility::Grid( m_pRenderer );
 		ZED_COLOUR GridColour;
 		GridColour.Red = 1.0f;
 		GridColour.Green = 1.0f;
 		GridColour.Blue = 0.0f;
 		GridColour.Alpha = 1.0f;
 
-		if( TestGrid.Initialise( 100, 100, ZED::Utility::PLANE_AXIS_XZ,
+		if( m_WorldGrid.Initialise( 100, 100, ZED::Utility::PLANE_AXIS_XZ,
 			GridColour, 0.0f, 1.0f ) != ZED_OK )
 		{
 			zedTrace( "Failed to create a grid\n" );
 			return ZED_FAIL;
 		}
 
-		ZED::Renderer::FreeCamera	MainCam;
 		ZED::Arithmetic::Vector3	CamPosition( 0.0f, 10.0f, 12.0f ),
 									CamLook( 0.0f, 0.0f, 0.0f ),
 									WorldUp( 0.0f, 1.0f, 0.0f );
 		ZED::Arithmetic::Matrix4x4	Projection, View, ProjView;
 
 
-		MainCam.ClippingPlanes( 1.0f, 10000.0f );
-		MainCam.PerspectiveProjection( 45.0f, 1280.0f / 720.0f, &Projection );
+		m_DebugCamera.ClippingPlanes( 1.0f, 10000.0f );
+		m_DebugCamera.PerspectiveProjection( 45.0f, 1280.0f / 720.0f, &Projection );
 		ZED::Arithmetic::Vector3 Velocity( 0.0f, 0.0f, 0.0f );
 		ZED::Arithmetic::Vector3 RotVec, RotVel;
-		MainCam.Position( CamPosition );
+		m_DebugCamera.Position( CamPosition );
 		ZED_UINT32 HalfWidth = 1280 / 2;
 		ZED_UINT32 HalfHeight = 720 / 2;
 		m_pWindow->WarpPointer( HalfWidth, HalfHeight );
@@ -190,19 +189,14 @@ namespace Dungeoneer
 			CamPosition += Velocity;
 			RotVec += RotVel;
 
-//			MainCam.ViewLookAt( CamPosition, CamLook, WorldUp );
-			MainCam.Move( Velocity );
-			MainCam.Rotate( RotVel );
-			MainCam.View( &View );
+			m_DebugCamera.Move( Velocity );
+			m_DebugCamera.Rotate( RotVel );
+			m_DebugCamera.View( &View );
 
 			ProjView = Projection * View;
 			
 			this->Update( 16667ULL );
-//			this->Render( );
-		m_pRenderer->BeginScene( ZED_TRUE, ZED_TRUE, ZED_TRUE );
-			TestGrid.Render( &ProjView );
-
-		m_pRenderer->EndScene( );
+			this->Render( );
 		}
 
 		m_pWindow->ShowCursor( );
@@ -216,7 +210,13 @@ namespace Dungeoneer
 
 	void Game::Render( )
 	{
+		ZED::Arithmetic::Matrix4x4 Projection, View, ProjView;
+		m_DebugCamera.Projection( &Projection );
+		m_DebugCamera.View( &View );
+		ProjView = Projection * View;
+
 		m_pRenderer->BeginScene( ZED_TRUE, ZED_TRUE, ZED_TRUE );
+		m_WorldGrid.Render( &( ProjView ) );
 		m_pRenderer->EndScene( );
 	}
 }

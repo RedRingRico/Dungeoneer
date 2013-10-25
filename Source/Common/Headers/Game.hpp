@@ -8,6 +8,8 @@
 #include <System/InputManager.hpp>
 #include <Renderer/Renderer.hpp>
 #include <Renderer/CanvasDescription.hpp>
+#include <Renderer/FreeCamera.hpp>
+#include <Utility/Grid.hpp>
 
 namespace Dungeoneer
 {
@@ -30,6 +32,8 @@ namespace Dungeoneer
 		ZED::System::Mouse					m_Mouse;
 		ZED::Renderer::Renderer				*m_pRenderer;
 		ZED::Renderer::CanvasDescription	m_Canvas;
+		ZED::Renderer::FreeCamera			m_DebugCamera;
+		ZED::Utility::Grid					m_WorldGrid;
 
 		ZED_BOOL	m_Running;
 	};
