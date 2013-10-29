@@ -191,10 +191,7 @@ namespace Dungeoneer
 
 			m_DebugCamera.Move( Velocity );
 			m_DebugCamera.Rotate( RotVel );
-			m_DebugCamera.View( &View );
 
-			ProjView = Projection * View;
-			
 			this->Update( 16667ULL );
 			this->Render( );
 		}

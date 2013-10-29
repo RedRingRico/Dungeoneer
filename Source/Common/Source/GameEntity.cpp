@@ -13,12 +13,12 @@ namespace Dungeoneer
 		return m_ID;
 	}
 
-	void GameEntity::Name( const char *p_pName )
+	void GameEntity::Name( const ZED_CHAR8 *p_pName )
 	{
 		strcpy( m_pName, p_pName );
 	}
 
-	char *GameEntity::Name( ) const
+	ZED_CHAR8 *GameEntity::Name( ) const
 	{
 		return m_pName;
 	}
