@@ -30,11 +30,16 @@ namespace Dungeoneer
 		return ZED_FAIL;
 	}
 
-	void RenderableGameEntity::Render( ) const
+	void RenderableGameEntity::Render(
+		const ZED::Arithmetic::Matrix4x4 &p_ProjectionView ) const
 	{
 		if( m_pRenderer->ShaderSupport( ) )
 		{
+			ZED::Arithmetic::Matrix4x4 ProjectionViewWorld;
+			ProjectionViewWorld.Translate( m_Position );
+			ProjectionViewWorld = p_ProjectionView * ProjectionViewWorld;
 			m_pShader->Activate( );
+			m_pShader->SetConstantData( 0, &p_ProjectionView );
 		}
 
 		m_pModel->Render( );

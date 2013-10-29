@@ -2,6 +2,10 @@
 #define __DUNGEONEER_RENDERABLEGAMEENTITY_HPP__
 
 #include <GameEntity.hpp>
+#include <Arithmetic/Matrix4x4.hpp>
+#include <Renderer/Model.hpp>
+#include <Renderer/Renderer.hpp>
+#include <Renderer/Shader.hpp>
 
 namespace Dungeoneer
 {
@@ -19,7 +23,8 @@ namespace Dungeoneer
 			const ZED_SHADER_TYPE p_Type,
 			const ZED_BOOL p_Relative = ZED_TRUE );
 
-		virtual void Render( ) const;
+		virtual void Render(
+			const ZED::Arithmetic::Matrix4x4 &p_ProjectionView ) const;
 
 	protected:
 		ZED::Renderer::Renderer		*m_pRenderer;

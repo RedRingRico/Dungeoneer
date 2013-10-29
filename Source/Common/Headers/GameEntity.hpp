@@ -4,9 +4,6 @@
 #include <System/DataTypes.hpp>
 #include <Arithmetic/Vector3.hpp>
 #include <Arithmetic/AABB.hpp>
-#include <Renderer/Model.hpp>
-#include <Renderer/Renderer.hpp>
-#include <Renderer/Shader.hpp>
 
 namespace Dungeoneer
 {
@@ -27,6 +24,7 @@ namespace Dungeoneer
 		void Orientation( const ZED::Arithmetic::Vector3 &p_Orientation );
 		ZED::Arithmetic::Vector3 Orientation( ) const;
 
+		virtual ZED_UINT32 Initialise( ) = 0;
 		virtual void Update( const ZED_UINT64 p_MicroSeconds ) = 0;
 
 	protected:

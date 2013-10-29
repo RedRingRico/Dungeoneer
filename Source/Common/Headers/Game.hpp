@@ -10,6 +10,7 @@
 #include <Renderer/CanvasDescription.hpp>
 #include <Renderer/FreeCamera.hpp>
 #include <Utility/Grid.hpp>
+#include <Player.hpp>
 
 namespace Dungeoneer
 {
@@ -36,6 +37,8 @@ namespace Dungeoneer
 		ZED::Utility::Grid					m_WorldGrid;
 
 		ZED_BOOL	m_Running;
+		
+		Player	m_Hero;
 	};
 }
 

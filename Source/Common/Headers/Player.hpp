@@ -1,16 +1,19 @@
 #ifndef __DUNGEONEER_PLAYER_HPP__
 #define __DUNGEONEER_PLAYER_HPP__
 
-#include <GameEntity.hpp>
+#include <RenderableGameEntity.hpp>
 
 namespace Dungeoneer
 {
-	class Player : public GameEntity
+	class Player : public RenderableGameEntity
 	{
 	public:
-		ZED_EXPLICIT Player( const char *p_pModel );
+		Player( );
 		virtual ~Player( );
 
+		virtual ZED_UINT32 Initialise( );
+
+		virtual void Update( const ZED_UINT64 p_MicroSeconds );
 	private:
 	};
 }

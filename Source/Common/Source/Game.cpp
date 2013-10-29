@@ -5,6 +5,7 @@
 #include <GitVersion.hpp>
 #include <Utility/Grid.hpp>
 #include <Renderer/FreeCamera.hpp>
+#include <Player.hpp>
 
 const ZED_FLOAT32 STRAFE_SPEED = 0.2f;
 const ZED_FLOAT32 THRUST_SPEED = 0.2f;
@@ -101,6 +102,9 @@ namespace Dungeoneer
 		m_pWindow->WarpPointer( HalfWidth, HalfHeight );
 		ZED_UINT32 MouseX = 0, MouseY = 0;
 		m_pWindow->HideCursor( );
+
+		m_Hero.Renderer( m_pRenderer );
+		m_Hero.Initialise( );
 
 		while( m_Running )
 		{
@@ -203,6 +207,7 @@ namespace Dungeoneer
 
 	void Game::Update( const ZED_UINT64 p_MicroSeconds )
 	{
+		m_Hero.Update( p_MicroSeconds );
 	}
 
 	void Game::Render( )
@@ -213,7 +218,10 @@ namespace Dungeoneer
 		ProjView = Projection * View;
 
 		m_pRenderer->BeginScene( ZED_TRUE, ZED_TRUE, ZED_TRUE );
+
 		m_WorldGrid.Render( &( ProjView ) );
+		m_Hero.Render( ProjView );
+
 		m_pRenderer->EndScene( );
 	}
 }
