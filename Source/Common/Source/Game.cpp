@@ -219,7 +219,7 @@ namespace Dungeoneer
 
 		m_pRenderer->BeginScene( ZED_TRUE, ZED_TRUE, ZED_TRUE );
 
-		m_WorldGrid.Render( &( ProjView ) );
+//		m_WorldGrid.Render( &( ProjView ) );
 		m_Hero.Render( ProjView );
 
 		m_pRenderer->EndScene( );

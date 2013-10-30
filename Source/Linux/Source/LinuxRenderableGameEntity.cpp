@@ -11,19 +11,41 @@ namespace Dungeoneer
 	{
 		if( m_pRenderer == ZED_NULL )
 		{
+			zedTrace( "[Dungeoneer::RenderableGameEntity::LoadModel] <ERROR> "
+				"Renderer has not been set\n" );
+
 			return ZED_FAIL;
 		}
+
+		zedTrace( "[Dungoneer::RenderableGameEntity::LoadModel] <INFO> "
+			"Loading model: \"%s\"\n", p_pFile );
 
 		switch( m_pRenderer->BackEnd( ) )
 		{
 			case ZED_RENDERER_BACKEND_OPENGL:
 			{
 				m_pModel = new ZED::Renderer::GLModel( m_pRenderer );
+				break;
 			}
 			default:
 			{
 				return ZED_FAIL;
 			}
+		}
+
+		if( m_pModel == ZED_NULL )
+		{
+			zedTrace( "[Dungoneer::RenderableGameEntity::LoadModel] <ERROR> "
+				"Could not instantiate a model class for model: %s\n",
+				p_pFile );
+			return ZED_FAIL;
+		}
+
+		zedTrace( "Loading model %s...\n", p_pFile );
+		if( m_pModel->Load( p_pFile ) != ZED_OK )
+		{
+			zedTrace( "Failed to load model\n" );
+			return ZED_FALSE;
 		}
 
 		return ZED_OK;
@@ -33,6 +55,7 @@ namespace Dungeoneer
 		const ZED_SHADER_TYPE p_Type, const ZED_BOOL p_Relative )
 	{
 		zedTrace( "Loading shader...\n" );
+
 		if( m_pRenderer == ZED_NULL )
 		{
 			return ZED_FAIL;

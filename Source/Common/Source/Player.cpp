@@ -32,5 +32,11 @@ namespace Dungeoneer
 	void Player::Update( const ZED_UINT64 p_MicroSeconds )
 	{
 	}
+
+	void Player::Render(
+		const ZED::Arithmetic::Matrix4x4 &p_ProjectionView ) const
+	{
+		Dungeoneer::RenderableGameEntity::Render( p_ProjectionView );
+	}
 }
 
